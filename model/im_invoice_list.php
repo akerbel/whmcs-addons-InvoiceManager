@@ -7,21 +7,37 @@ class im_invoice_list {
 	public $page;
 	public $perpage;
 	public $maxpage;
+	public $order;
 	public $invoices = array();
 	public $tablehead;
 	public $paginator;
 	
-	public function __construct($perpage, $page){
+	public function __construct($perpage){
 		$this->perpage = $perpage;
+		
+		$page = $_GET['page'];
 		if ($page != NULL)
 			$this->page = $page;
 		else 
 			$this->page = 1;
-		$this->create_paginator();
+		
+		$order = $_GET['order'];
+		if ($order != NULL)
+			$this->order = $order;
+		else 
+			$this->order = 'id';
+		
+		$sort = $_GET['sort'];
+		if ($sort != NULL)
+			$this->sort = $sort;
+		else 
+			$this->sort = 'DESC';
+		
+		$this->createPaginator();
 		$result = full_query("
 			SELECT *
 			FROM tblinvoices
-			ORDER BY id DESC
+			ORDER BY ".$this->order." ".$this->sort."
 			LIMIT ".($this->page-1).", $perpage
 		");
 		
@@ -31,7 +47,7 @@ class im_invoice_list {
 		$this->tablehead = array_keys($this->invoices[0]);
 	}
 	
-	public function create_paginator(){
+	public function createPaginator(){
 		$result = full_query("
 			SELECT count(*) AS count
 			FROM tblinvoices
@@ -60,7 +76,26 @@ class im_invoice_list {
 		$this->paginator = $res;
 	}
 	
+	public function getUrl($newdata = array()){
+		$data = array(
+			'page' => $this->page,
+			'order' => $this->order,
+			'sort' => $this->sort,
+		);
+		foreach ($newdata as $k=>$v){
+			$data[$k] = $v;
+		}
+		$url = '/whmcs_oss/admin/addonmodules.php?module=InvoiceManager';
+		foreach ($data as $k=>$v){
+			$url .= '&'.$k.'='.$v;
+		}
+		return $url;
+	}
 	
+	public function toggleSort($sort){
+		if ($sort == 'DESC') return 'ASC';
+		if ($sort == 'ASC') return 'DESC';
+	}
 }
 
 ?>

@@ -26,7 +26,6 @@ function InvoiceManager_deactivate() {
 function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
 	include_once('model/im_invoice.php');
-	$page = $_GET['page'];
-	$list = new im_invoice_list($vars['InvoicesPerPage'],$page);
+	$list = new im_invoice_list($vars['InvoicesPerPage']);
 	include_once('templates/list.php');
 }
