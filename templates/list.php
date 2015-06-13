@@ -7,6 +7,7 @@ if (!defined("WHMCS"))
 	<table id="sortabletbl0" class="datatable" width="100%" cellspacing="1" cellpadding="3" border="0">
 		<tbody>
 			<tr>
+				<th><input id="checkall0" type="checkbox"></th>
 				<?php foreach ($list->tablehead as $value) {?>
 					<th>
 						<?php if ($list->order != $value){ ?>
@@ -17,13 +18,14 @@ if (!defined("WHMCS"))
 								<img class="absmiddle" src="images/<?php echo strtolower($list->sort);?>.gif">
 							</a>
 						<?php } ?>
-								
-							
 					</th>
 				<?php } ?>
 			</tr>
 			<?php foreach ($list->invoices as $invoice) {?>
 				<tr>
+					<td>
+						<input class="checkall" type="checkbox" name="checkbox_<?=$invoice['id']?>">
+					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<td>
 							<input type="text" value="<?=$value?>" name="<?=$key?>_<?=$invoice['id']?>">
@@ -35,3 +37,11 @@ if (!defined("WHMCS"))
 	</table>
 </div>
 <div><?=$list->paginator?></div>
+
+<script>
+	$('document').ready(function(){
+		$('#checkall0').on('click', function(){
+			$('.checkall').attr({'checked': $(this).prop('checked')});
+		});
+	});
+</script>
