@@ -25,11 +25,11 @@ if (!defined("WHMCS"))
 			<?php foreach ($list->invoices as $invoice) {?>
 				<tr>
 					<td>
-						<input class="checkall" type="checkbox" name="checkbox[<?=$invoice['id']?>]">
+						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<td>
-							<input type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]">
+							<input class="invoice_data" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
 						</td>
 					<?php } ?>
 				</tr>
@@ -44,6 +44,10 @@ if (!defined("WHMCS"))
 	$('document').ready(function(){
 		$('#checkall0').on('click', function(){
 			$('.checkall').attr({'checked': $(this).prop('checked')});
+		});
+		
+		$('.invoice_data').on('change', function(){
+			$('#checkbox_'+$(this).attr('invoice_id')).attr({'checked': true});
 		});
 	});
 </script>
