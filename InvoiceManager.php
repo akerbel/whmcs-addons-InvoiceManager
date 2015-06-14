@@ -27,7 +27,8 @@ function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
 	include_once('model/im_invoice.php');
 	if (isset($_POST['checkbox']) and (count($_POST['checkbox']))){
-		im_invoice_list::save();
+		$result = im_invoice_list::saveAll();
+		echo $result['message'];
 	}
 	$list = new im_invoice_list($vars['InvoicesPerPage']);
 	include_once('templates/list.php');

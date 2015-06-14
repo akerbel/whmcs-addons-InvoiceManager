@@ -86,11 +86,29 @@ class im_invoice_list {
 		if ($sort == 'ASC') return 'DESC';
 	}
 	
-	public static function save(){
+	public static function saveAll(){
 		$checkboxes = $_POST['checkbox'];
 		$invoices = $_POST['invoices'];
 		foreach ($checkboxes as $id=>$value){
 			if ($value == 'on'){
+				if ($id != $invoices[$id]['id']){
+					$result = select_query('tblinvoices', 'id', array('id' => $invoices[$id]['id']));
+					$data = mysql_fetch_array($result);
+					if ($data){ 
+						return array(
+							'result' => 'error', 
+							'message' => 'Invoice#'.$invoices[$id]['id'].' already exist. Can`t change invoice id from '.$id.' to '.$invoices[$id]['id']
+						);
+					}else{
+						update_query('tblinvoices', array('id'=>$invoices[$id]['id']), array('id' => $id));
+						update_query('tblinvoiceitems', array('invoiceid'=>$invoices[$id]['id']), array('invoiceid' => $id));
+						update_query('tblorders', array('invoiceid'=>$invoices[$id]['id']), array('invoiceid' => $id));
+						unset($invoices[$id]['id']);
+						$max = mysql_fetch_assoc(select_query('tblinvoices', 'max(id) AS max', array()));
+						full_query('ALTER TABLE tblinvoices AUTO_INCREMENT = '.$max['max']);
+					}
+				}
+				
 				$update = array();
 				foreach ($invoices[$id] as $k=>$v){
 					$update[$k] = $v;
@@ -98,6 +116,7 @@ class im_invoice_list {
 				update_query('tblinvoices', $update, array('id' => $id));
 			}
 		}
+		return array('result' => 'success', 'message' => 'success!');
 	}
 }
 
