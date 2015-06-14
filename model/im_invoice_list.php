@@ -4,7 +4,7 @@ if (!defined("WHMCS"))
 
 class im_invoice_list {
 	
-	public $mainurl = '/whmcs_oss/admin/addonmodules.php?module=InvoiceManager';
+	public $mainurl = '/admin/addonmodules.php?module=InvoiceManager';
 	public $page = 1;
 	public $perpage;
 	public $maxpage;
@@ -100,10 +100,8 @@ class im_invoice_list {
 							'message' => 'Invoice#'.$invoices[$id]['id'].' already exist. Can`t change invoice id from '.$id.' to '.$invoices[$id]['id']
 						);
 					}else{
-						update_query('tblinvoices', array('id'=>$invoices[$id]['id']), array('id' => $id));
 						update_query('tblinvoiceitems', array('invoiceid'=>$invoices[$id]['id']), array('invoiceid' => $id));
 						update_query('tblorders', array('invoiceid'=>$invoices[$id]['id']), array('invoiceid' => $id));
-						unset($invoices[$id]['id']);
 						$max = mysql_fetch_assoc(select_query('tblinvoices', 'max(id) AS max', array()));
 						full_query('ALTER TABLE tblinvoices AUTO_INCREMENT = '.$max['max']);
 					}
