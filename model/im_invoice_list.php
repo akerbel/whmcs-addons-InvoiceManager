@@ -30,6 +30,7 @@ class im_invoice_list {
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
+			
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
@@ -83,6 +84,20 @@ class im_invoice_list {
 	public function toggleSort($sort){
 		if ($sort == 'DESC') return 'ASC';
 		if ($sort == 'ASC') return 'DESC';
+	}
+	
+	public static function save(){
+		$checkboxes = $_POST['checkbox'];
+		$invoices = $_POST['invoices'];
+		foreach ($checkboxes as $id=>$value){
+			if ($value == 'on'){
+				$update = array();
+				foreach ($invoices[$id] as $k=>$v){
+					$update[$k] = $v;
+				}
+				update_query('tblinvoices', $update, array('id' => $id));
+			}
+		}
 	}
 }
 

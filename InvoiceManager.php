@@ -10,7 +10,7 @@ function InvoiceManager_config() {
     "author" => "Anton Kerbel",
     "language" => "english",
     "fields" => array(
-		"InvoicesPerPage" => array ("FriendlyName" => "Invoices per page", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "50", ),
+		"InvoicesPerPage" => array ("FriendlyName" => "Invoices per page", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "20", ),
 		));
     return $configarray;
 }
@@ -26,6 +26,9 @@ function InvoiceManager_deactivate() {
 function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
 	include_once('model/im_invoice.php');
+	if (isset($_POST['checkbox']) and (count($_POST['checkbox']))){
+		im_invoice_list::save();
+	}
 	$list = new im_invoice_list($vars['InvoicesPerPage']);
 	include_once('templates/list.php');
 }

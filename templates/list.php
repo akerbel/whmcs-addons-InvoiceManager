@@ -3,6 +3,7 @@ if (!defined("WHMCS"))
 	die("This file cannot be accessed directly");
 ?>
 <div><?=$list->paginator?></div>
+<form name="invoice_list" method="post" action="">
 <div class="tablebg">
 	<table id="sortabletbl0" class="datatable" width="100%" cellspacing="1" cellpadding="3" border="0">
 		<tbody>
@@ -24,17 +25,18 @@ if (!defined("WHMCS"))
 			<?php foreach ($list->invoices as $invoice) {?>
 				<tr>
 					<td>
-						<input class="checkall" type="checkbox" name="checkbox_<?=$invoice['id']?>">
+						<input class="checkall" type="checkbox" name="checkbox[<?=$invoice['id']?>]">
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<td>
-							<input type="text" value="<?=$value?>" name="<?=$key?>_<?=$invoice['id']?>">
+							<input type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]">
 						</td>
 					<?php } ?>
 				</tr>
 			<?php } ?>
 		</tbody>
 	</table>
+	<input class="btn" type="submit" value="Save" name="Save">
 </div>
 <div><?=$list->paginator?></div>
 
