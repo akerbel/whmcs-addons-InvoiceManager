@@ -31,7 +31,6 @@ if (!defined("WHMCS"))
 	width: 60px;
 }
 </style>
-
 <div><?=$list->paginator?></div>
 <form name="invoice_list" method="post" action="">
 <div class="tablebg">
@@ -53,7 +52,7 @@ if (!defined("WHMCS"))
 				<?php } ?>
 			</tr>
 			<?php foreach ($list->invoices as $invoice) {?>
-				<tr>
+				<tr class="invoice_tr">
 					<td>
 						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
 					</td>
@@ -67,11 +66,37 @@ if (!defined("WHMCS"))
 										<option value="<?=$status?>"<?php if ($status == $value){ ?> selected<?php } ?>><?=$status?></option>
 									<?php } ?>
 								</select>
+							<?php }elseif ($key == 'items'){ ?>
+
 							<?php }else{ ?>
 								<?=$value?>
 							<?php } ?>
 						</td>
 					<?php } ?>
+				</tr>
+				<tr style="display:none;">
+					<td colspan="<?php echo count($list->tablehead); ?>">
+						<table width="100%">
+							<tbody>
+								<tr>
+									<th>#</th><th>Description</th><th>Amount</th>
+								</tr>
+								<?php foreach ($invoice['items'] as $i=>$item){ ?>
+									<tr>
+										<td align="center">
+											<?php echo $i+1; ?>
+										</td>
+										<td>
+											<?=$item['description']?>
+										</td>
+										<td align="center">
+											<?=$item['amount']?>
+										</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</td>
 				</tr>
 			<?php } ?>
 		</tbody>
@@ -88,6 +113,10 @@ if (!defined("WHMCS"))
 		
 		$('.invoice_data').on('change', function(){
 			$('#checkbox_'+$(this).attr('invoice_id')).attr({'checked': true});
+		});
+		
+		$('.invoice_tr').on('click', function(){
+			$(this).next('tr').toggle();
 		});
 	});
 </script>

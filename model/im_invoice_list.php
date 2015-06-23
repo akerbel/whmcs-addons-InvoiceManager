@@ -13,6 +13,7 @@ class im_invoice_list {
 	public $invoices = array();
 	public $tablehead;
 	public $paginator;
+	public $statuses = array('Unpaid', 'Paid', 'Cancelled', 'Refunded', 'Collections');
 	
 	public function __construct($perpage){
 		$this->perpage = $perpage;
@@ -33,10 +34,19 @@ class im_invoice_list {
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
+			$invoice['items'] = array();
+			$items = full_query("
+				SELECT description, amount
+				FROM tblinvoiceitems
+				WHERE invoiceid = ".$invoice['id']."
+			");
+			while ($item = mysql_fetch_assoc($items)){
+				$invoice['items'][] = $item;
+			}
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
-		$this->statuses = array('Unpaid', 'Paid', 'Cancelled', 'Refunded', 'Collections');
+		array_pop($this->tablehead);
 	}
 	
 	public function createPaginator(){
