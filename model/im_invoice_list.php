@@ -4,7 +4,7 @@ if (!defined("WHMCS"))
 
 class im_invoice_list {
 	
-	public $mainurl = '/whmcs_oss/admin/addonmodules.php?module=InvoiceManager';
+	public $mainurl = '/admin/addonmodules.php?module=InvoiceManager';
 	public $page = 1;
 	public $perpage;
 	public $maxpage;
