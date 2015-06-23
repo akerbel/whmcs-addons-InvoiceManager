@@ -4,7 +4,7 @@ if (!defined("WHMCS"))
 
 class im_invoice_list {
 	
-	public $mainurl = '/admin/addonmodules.php?module=InvoiceManager';
+	public $mainurl = '/whmcs_oss/admin/addonmodules.php?module=InvoiceManager';
 	public $page = 1;
 	public $perpage;
 	public $maxpage;
@@ -23,17 +23,20 @@ class im_invoice_list {
 		
 		$this->createPaginator();
 		$result = full_query("
-			SELECT *
-			FROM tblinvoices
+			SELECT i.id AS id, c.firstname AS firstname, c.lastname AS lastname, c.companyname AS companyname, 
+				c.email AS email, i.invoicenum AS invoicenum, i.date AS date, i.duedate AS duedate,
+				i.datepaid AS datepaid, i.status AS status, i.paymentmethod AS paymentmethod, i.notes AS notes
+			FROM tblinvoices AS i
+			INNER JOIN tblclients AS c ON c.id = i.userid
 			ORDER BY ".$this->order." ".$this->sort."
 			LIMIT ".(($this->page-1)*$this->perpage).", $perpage
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
-			
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
+		$this->statuses = array('Unpaid', 'Paid', 'Cancelled', 'Refunded', 'Collections');
 	}
 	
 	public function createPaginator(){

@@ -22,7 +22,7 @@ if (!defined("WHMCS"))
 	width: 60px;
 }
 .im_status{
-	width: 60px;
+	width: 90px;
 }
 .im_paymentmethod{
 	width: 100px;
@@ -59,7 +59,17 @@ if (!defined("WHMCS"))
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<td>
-							<input class="invoice_data im_<?=$key?>" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
+							<?php if (($key == 'id') or ($key == 'notes')){?>
+								<input class="invoice_data im_<?=$key?>" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
+							<?php }elseif ($key == 'status'){ ?>
+								<select class="invoice_data im_<?=$key?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
+									<?php foreach ($list->statuses as $status){ ?>
+										<option value="<?=$status?>"<?php if ($status == $value){ ?> selected<?php } ?>><?=$status?></option>
+									<?php } ?>
+								</select>
+							<?php }else{ ?>
+								<?=$value?>
+							<?php } ?>
 						</td>
 					<?php } ?>
 				</tr>
