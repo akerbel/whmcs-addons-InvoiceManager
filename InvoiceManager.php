@@ -25,11 +25,18 @@ function InvoiceManager_deactivate() {
 
 function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
-	include_once('model/im_invoice.php');
 	if (isset($_POST['checkbox']) and (count($_POST['checkbox']))){
 		$result = im_invoice_list::saveAll();
-		echo $result['message'];
+		echo im_invoice_list::showMessage($result);
 	}
+	
 	$list = new im_invoice_list($vars['InvoicesPerPage']);
-	include_once('templates/list.php');
+	
+	if ((isset($_GET['action'])) and ($_GET['action'] == 'fillgaps')){
+		$fillresult = $list->fillGaps();
+		echo im_invoice_list::showMessage($fillresult);
+		include_once('templates/fillgaps.php');
+	}else{
+		include_once('templates/list.php');
+	}
 }

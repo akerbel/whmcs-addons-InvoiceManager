@@ -10,6 +10,7 @@ class im_invoice_list {
 	public $maxpage;
 	public $order = 'id';
 	public $sort = 'DESC';
+	public $action = 'list';
 	public $invoices = array();
 	public $tablehead;
 	public $paginator;
@@ -78,11 +79,19 @@ class im_invoice_list {
 		$this->paginator = $res;
 	}
 	
+	public static function showMessage($result){
+		if (is_array($result))
+			return '<div class="'.$result['result'].'box"><span class="title">'.$result['result'].'</span><br>'.$result['message'].'</div>';
+		else 
+			return '<div class="infobox"><span class="title">'.$result.'</span></div>';
+	}
+	
 	public function getUrl($newdata = array()){
 		$data = array(
 			'page' => $this->page,
 			'order' => $this->order,
 			'sort' => $this->sort,
+			'action' => $this->action,
 		);
 		foreach ($newdata as $k=>$v){
 			$data[$k] = $v;
@@ -127,7 +136,59 @@ class im_invoice_list {
 				update_query('tblinvoices', $update, array('id' => $id));
 			}
 		}
-		return array('result' => 'success', 'message' => 'success!');
+		return array('result' => 'success', 'message' => 'Changes have been saved');
+	}
+	
+	public function getIds(){
+		$ids = array();
+		$result = full_query('SELECT id FROM tblinvoices ORDER BY id ASC');
+		$i = 1;
+		while ($id = mysql_fetch_array($result)){
+			$ids[$i] = $id['id'];
+			$i++;
+		}
+		return $ids;
+	}
+	
+	public function fillGaps(){
+		$changes = array();
+		foreach ($this->getIds() as $key=>$value){
+			if ($key!=$value){
+				$result = $this->saveId($value, $key);
+				if ($result['result']!='success') {
+					$result['changes'] = $changes;
+					return $result;
+				}
+				$changes[$value] = $key;
+			}
+		}
+		if (!count($changes)){
+			$message = 'Nothing to fill';
+		}else{
+			$message = 'The gaps were filled';
+		}
+		return array('result' => 'success', 'message' => $message, 'changes' => $changes);
+	}
+	
+	private function saveId($id, $newid){
+		$result = select_query('tblinvoices', 'id', array('id' => $newid));
+		$data = mysql_fetch_array($result);
+		if ($data){ 
+			return array(
+				'result' => 'error', 
+				'message' => 'Invoice#'.$newid.' already exist. Can`t change invoice id from '.$id.' to '.$newid
+			);
+		}else{
+			update_query('tblinvoices', array('id' => $newid), array('id' => $id));
+			update_query('tblinvoiceitems', array('invoiceid' => $newid), array('invoiceid' => $id));
+			update_query('tblorders', array('invoiceid' => $newid), array('invoiceid' => $id));
+			$max = mysql_fetch_assoc(select_query('tblinvoices', 'max(id) AS max', array()));
+			full_query('ALTER TABLE tblinvoices AUTO_INCREMENT = '.$max['max']);
+			return array(
+				'result' => 'success', 
+				'message' => 'success!',
+			);
+		}
 	}
 }
 

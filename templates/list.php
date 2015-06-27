@@ -101,7 +101,8 @@ if (!defined("WHMCS"))
 			<?php } ?>
 		</tbody>
 	</table>
-	<input class="btn" type="submit" value="Save" name="Save">
+	<input class="btn" type="submit" value="Save" name="Save" id="Save">
+	<input class="btn" type="button" value="Fill Gaps" name="fillgaps" id="fillgaps">
 </div>
 <div><?=$list->paginator?></div>
 
@@ -117,6 +118,20 @@ if (!defined("WHMCS"))
 		
 		$('.invoice_tr').on('click', function(){
 			$(this).next('tr').toggle();
+		});
+		
+		$('#Save').on('click', function(){
+			if (confirm("Are you sure?")) {
+				return true;
+			}else{
+				return false;
+			}
+		});
+		
+		$('#fillgaps').on('click', function(){
+			if (confirm("Are you sure you want to fill in the gaps? The action is irreversible.")) {
+				document.location.href ='<?php echo $list->getUrl(array('action' => 'fillgaps')); ?>';
+			}
 		});
 	});
 </script>
