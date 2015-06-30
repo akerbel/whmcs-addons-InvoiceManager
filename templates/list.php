@@ -2,35 +2,7 @@
 if (!defined("WHMCS")) 
 	die("This file cannot be accessed directly");
 ?>
-<style> 
-.im_id{
-	width: 24px;
-}
-.im_userid{
-	width: 30px;
-}
-.im_invoicenum{
-	width: 60px;
-}
-.im_date, .im_duedate{
-	width: 70px;
-}
-.im_datepaid{
-	width: 120px;
-}
-.im_subtotal, .im_credit, .im_tax, .im_tax2, .im_total, .im_taxrate, .im_taxrate2{
-	width: 60px;
-}
-.im_status{
-	width: 90px;
-}
-.im_paymentmethod{
-	width: 100px;
-}
-.im_notes{
-	width: 60px;
-}
-</style>
+
 <div><?=$list->paginator?></div>
 <form name="invoice_list" method="post" action="">
 <div class="tablebg">
@@ -58,7 +30,7 @@ if (!defined("WHMCS"))
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<td>
-							<?php if (($key == 'id') or ($key == 'notes')){?>
+							<?php if (($key == 'invoicenum') or ($key == 'notes')){?>
 								<input class="invoice_data im_<?=$key?>" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
 							<?php }elseif ($key == 'status'){ ?>
 								<select class="invoice_data im_<?=$key?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
