@@ -2,21 +2,19 @@
 if (!defined("WHMCS")) 
 	die("This file cannot be accessed directly");
 
-global $customadminpath; 
-
 class im_invoice_list {
 	
-	public $mainurl = '/'.$customadminpath.'/addonmodules.php?module=InvoiceManager';
 	public $page = 1;
 	public $perpage;
 	public $maxpage;
 	public $order = 'id';
 	public $sort = 'DESC';
 	public $action = 'list';
+	public $status = 'Paid';
 	public $invoices = array();
 	public $tablehead;
 	public $paginator;
-	public $statuses = array('Unpaid', 'Paid', 'Cancelled', 'Refunded', 'Collections');
+	public $statuses = array('Paid', 'Unpaid', 'Cancelled', 'Refunded', 'Collections');
 	
 	public function __construct($perpage){
 		$this->perpage = $perpage;
@@ -24,14 +22,16 @@ class im_invoice_list {
 		if ($_GET['page'] != NULL) $this->page = $_GET['page'];
 		if ($_GET['order'] != NULL) $this->order = $_GET['order'];	
 		if ($_GET['sort'] != NULL) $this->sort = $_GET['sort'];
+		if ($_GET['status'] != NULL) $this->status = $_GET['status'];
 		
 		$this->createPaginator();
 		$result = full_query("
 			SELECT i.id AS id, i.invoicenum AS invoicenum, c.firstname AS firstname, c.lastname AS lastname, c.companyname AS companyname, 
 				c.email AS email, i.date AS date, i.duedate AS duedate,
-				i.datepaid AS datepaid, i.status AS status, i.paymentmethod AS paymentmethod, i.notes AS notes
+				i.datepaid AS datepaid, i.status AS status, i.paymentmethod AS paymentmethod, i.notes AS notes, i.userid AS userid
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
+			WHERE i.status = '".$this->status."'
 			ORDER BY ".$this->order." ".$this->sort."
 			LIMIT ".(($this->page-1)*$this->perpage).", $perpage
 		");
@@ -49,7 +49,7 @@ class im_invoice_list {
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
-		array_pop($this->tablehead);
+		array_pop($this->tablehead);array_pop($this->tablehead);
 	}
 	
 	public function createPaginator(){
@@ -89,6 +89,7 @@ class im_invoice_list {
 	}
 	
 	public function getUrl($newdata = array()){
+		global $customadminpath;
 		$data = array(
 			'page' => $this->page,
 			'order' => $this->order,
@@ -98,7 +99,7 @@ class im_invoice_list {
 		foreach ($newdata as $k=>$v){
 			$data[$k] = $v;
 		}
-		$url = $this->mainurl;
+		$url = '/'.$customadminpath.'/addonmodules.php?module=InvoiceManager';
 		foreach ($data as $k=>$v){
 			$url .= '&'.$k.'='.$v;
 		}
