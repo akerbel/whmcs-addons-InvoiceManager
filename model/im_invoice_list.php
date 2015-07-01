@@ -6,8 +6,9 @@ class im_invoice_list {
 	
 	public $page = 1;
 	public $perpage;
+	public $firstinvoicenum;
 	public $maxpage;
-	public $order = 'id';
+	public $order = 'invoicenum';
 	public $sort = 'DESC';
 	public $action = 'list';
 	public $status = 'Paid';
@@ -16,8 +17,9 @@ class im_invoice_list {
 	public $paginator;
 	public $statuses = array('Paid', 'Unpaid', 'Cancelled', 'Refunded', 'Collections');
 	
-	public function __construct($perpage){
-		$this->perpage = $perpage;
+	public function __construct($vars){
+		$this->perpage = $vars['InvoicesPerPage'];
+		$this->firstinvoicenum = $vars['FirstInvoicenum'];
 	
 		if ($_GET['page'] != NULL) $this->page = $_GET['page'];
 		if ($_GET['order'] != NULL) $this->order = $_GET['order'];	
@@ -32,8 +34,8 @@ class im_invoice_list {
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
 			WHERE i.status = '".$this->status."'
-			ORDER BY ".$this->order." ".$this->sort."
-			LIMIT ".(($this->page-1)*$this->perpage).", $perpage
+			ORDER BY ".($this->order == 'invoicenum' ? "CAST(".$this->order." AS INT) " : $this->order.' '). $this->sort."
+			LIMIT ".(($this->page-1)*$this->perpage).", ".$this->perpage."
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
@@ -56,8 +58,10 @@ class im_invoice_list {
 		$result = full_query("
 			SELECT count(*) AS count
 			FROM tblinvoices
+			WHERE status = '".$this->status."'
 		");
 		$count = mysql_fetch_assoc($result);
+		$this->count = $count['count'];
 		$this->maxpage = floor($count['count']/$this->perpage);
 		if (ceil($count['count']/$this->perpage) != $this->maxpage) $this->maxpage += 1;
 		$res = '';
@@ -95,6 +99,7 @@ class im_invoice_list {
 			'order' => $this->order,
 			'sort' => $this->sort,
 			'action' => $this->action,
+			'status' => $this->status,
 		);
 		foreach ($newdata as $k=>$v){
 			$data[$k] = $v;
@@ -145,14 +150,14 @@ class im_invoice_list {
 	public function getInvoicenums(){
 		$invoicenums = array();
 		$result = full_query('
-			SELECT invoicenum 
+			SELECT id, invoicenum 
 			FROM tblinvoices 
 			WHERE status = "Paid"
-			ORDER BY invoicenum ASC
+			ORDER BY id ASC
 		');
-		$i = 1;
+		$i = $this->firstinvoicenum;
 		while ($invoicenum = mysql_fetch_array($result)){
-			$invoicenums[$i] = $invoicenum['invoicenum'];
+			$invoicenums[$i] = array('id' => $invoicenum['id'], 'invoicenum' => $invoicenum['invoicenum']);
 			$i++;
 		}
 		return $invoicenums;
@@ -161,13 +166,9 @@ class im_invoice_list {
 	public function fillGaps(){
 		$changes = array();
 		foreach ($this->getInvoicenums() as $key=>$value){
-			if ($key!=$value){
-				$result = $this->saveId($value, $key);
-				if ($result['result']!='success') {
-					$result['changes'] = $changes;
-					return $result;
-				}
-				$changes[$value] = $key;
+			if ($key!=$value['invoicenum']){
+				update_query('tblinvoices', array('invoicenum' => $key), array('id' => $value['id']));
+				$changes[$value['id']] = array($key, $value['invoicenum']);
 			}
 		}
 		if (!count($changes)){
@@ -178,26 +179,6 @@ class im_invoice_list {
 		return array('result' => 'success', 'message' => $message, 'changes' => $changes);
 	}
 	
-	private function saveId($id, $newid){
-		$result = select_query('tblinvoices', 'id', array('id' => $newid));
-		$data = mysql_fetch_array($result);
-		if ($data){ 
-			return array(
-				'result' => 'error', 
-				'message' => 'Invoice#'.$newid.' already exist. Can`t change invoice id from '.$id.' to '.$newid
-			);
-		}else{
-			update_query('tblinvoices', array('id' => $newid), array('id' => $id));
-			update_query('tblinvoiceitems', array('invoiceid' => $newid), array('invoiceid' => $id));
-			update_query('tblorders', array('invoiceid' => $newid), array('invoiceid' => $id));
-			$max = mysql_fetch_assoc(select_query('tblinvoices', 'max(id) AS max', array()));
-			full_query('ALTER TABLE tblinvoices AUTO_INCREMENT = '.$max['max']);
-			return array(
-				'result' => 'success', 
-				'message' => 'success!',
-			);
-		}
-	}
 }
 
 ?>

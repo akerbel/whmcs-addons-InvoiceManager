@@ -12,6 +12,7 @@ Show invoices:
 	<?php } ?>
 <?php } ?>
 </div>
+<div>Total <?=$list->status?> invoices: <b><?=$list->count?></b></div>
 <div><?=$list->paginator?></div>
 <form name="invoice_list" method="post" action="">
 <div class="tablebg">
@@ -55,6 +56,8 @@ Show invoices:
 
 						<?php }elseif (($key == 'firstname') or ($key == 'lastname') or ($key == 'companyname')){ ?>
 							<td><a href="clientssummary.php?userid=<?=$invoice['userid']?>"><?=$value?></a></td>
+						<?php }elseif ($key == 'id'){ ?>
+							<td><a href="invoices.php?action=edit&id=<?=$invoice['userid']?>"><?=$value?></a></td>
 						<?php }else{ ?>
 							<td><?=$value?></td>
 						<?php } ?>

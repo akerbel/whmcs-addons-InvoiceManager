@@ -8,11 +8,13 @@ if (!defined("WHMCS"))
 	<table class="datatable" width="100%" cellspacing="1" cellpadding="3" border="0">
 		<tbody>
 			<tr>
-				<th>Old ID</th><th>New ID</th>
+				<th>id</th><th>Old ID</th><th>New ID</th>
 			</tr>
-			<?php foreach ($fillresult['changes'] as $old=>$new){ ?>
+			<?php foreach ($fillresult['changes'] as $id=>$invoicenum){ ?>
 				<tr>
-					<td align="right"><?=$old?></td><td align="left"><?=$new?></td>
+					<td align="center"><?=$id?></td>
+					<td align="right"><?=$invoicenum[0]?></td>
+					<td align="left"><?=$invoicenum[1]?></td>
 				</tr>
 			<?php } ?>
 		</tbody>

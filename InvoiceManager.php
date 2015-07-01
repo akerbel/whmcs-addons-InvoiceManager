@@ -11,6 +11,7 @@ function InvoiceManager_config() {
     "language" => "english",
     "fields" => array(
 		"InvoicesPerPage" => array ("FriendlyName" => "Invoices per page", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "20", ),
+		"FirstInvoicenum" => array ("FriendlyName" => "First invoicenum", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "1", ),
 		));
     return $configarray;
 }
@@ -30,8 +31,7 @@ function InvoiceManager_output($vars) {
 		echo im_invoice_list::showMessage($result);
 	}
 	
-	$list = new im_invoice_list($vars['InvoicesPerPage']);
-	
+	$list = new im_invoice_list($vars);
 	if ((isset($_GET['action'])) and ($_GET['action'] == 'fillgaps')){
 		$fillresult = $list->fillGaps();
 		echo im_invoice_list::showMessage($fillresult);
