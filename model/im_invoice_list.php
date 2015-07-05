@@ -34,7 +34,7 @@ class im_invoice_list {
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
 			WHERE i.status = '".$this->status."'
-			ORDER BY ".$this->order.' '.$this->sort."
+			ORDER BY ".($this->order == 'invoicenum' ? "CAST(".$this->order." AS INT) " : $this->order.' '). $this->sort."
 			LIMIT ".(($this->page-1)*$this->perpage).", ".$this->perpage."
 		");
 		
