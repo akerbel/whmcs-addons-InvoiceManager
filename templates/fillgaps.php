@@ -13,8 +13,8 @@ if (!defined("WHMCS"))
 			<?php foreach ($fillresult['changes'] as $id=>$invoicenum){ ?>
 				<tr>
 					<td align="center"><?=$id?></td>
-					<td align="right"><?=$invoicenum[0]?></td>
-					<td align="left"><?=$invoicenum[1]?></td>
+					<td align="right"><?=$invoicenum[1]?></td>
+					<td align="left"><?=$invoicenum[0]?></td>
 				</tr>
 			<?php } ?>
 		</tbody>

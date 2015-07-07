@@ -34,8 +34,9 @@ class im_invoice_list {
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
 			WHERE i.status = '".$this->status."'
-			ORDER BY ".($this->order == 'invoicenum' ? "CAST(".$this->order." AS INT) " : $this->order.' '). $this->sort."
-			LIMIT ".(($this->page-1)*$this->perpage).", ".$this->perpage."
+			".//"ORDER BY ".($this->order == 'invoicenum' ? "CAST(".$this->order." AS INT) " : $this->order.' '). $this->sort.
+			" ORDER BY ".$this->order." ".$this->sort.
+			" LIMIT ".(($this->page-1)*$this->perpage).", ".$this->perpage."
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
@@ -121,7 +122,7 @@ class im_invoice_list {
 		$invoices = $_POST['invoices'];
 		foreach ($checkboxes as $id=>$value){
 			if ($value == 'on'){
-				if ($id != $invoices[$id]['id']){
+				/*if ($id != $invoices[$id]['id']){
 					$result = select_query('tblinvoices', 'id', array('id' => $invoices[$id]['id']));
 					$data = mysql_fetch_array($result);
 					if ($data){ 
@@ -135,10 +136,19 @@ class im_invoice_list {
 						$max = mysql_fetch_assoc(select_query('tblinvoices', 'max(id) AS max', array()));
 						full_query('ALTER TABLE tblinvoices AUTO_INCREMENT = '.$max['max']);
 					}
-				}
+				}*/
 				
 				$update = array();
 				foreach ($invoices[$id] as $k=>$v){
+					if ($k == 'invoicenum'){
+						$result = mysql_fetch_assoc(select_query('tblinvoices', 'id', array('invoicenum' => $v)));
+						if ($result){
+							return array(
+								'result' => 'error', 
+								'message' => 'Invoicenum#'.$v.' already exist(ID#'.$result['id'].'). Can`t change invoicenum for ID#'.$id,
+							);
+						}
+					}
 					$update[$k] = $v;
 				}
 				update_query('tblinvoices', $update, array('id' => $id));
