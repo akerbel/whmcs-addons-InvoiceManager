@@ -12,6 +12,7 @@ Show invoices:
 	<?php } ?>
 <?php } ?>
 </div>
+<div>Total invoices: <b><?=$list->fullcount?></b></div>
 <div>Total <?=$list->status?> invoices: <b><?=$list->count?></b></div>
 <div><?=$list->paginator?></div>
 <form name="invoice_list" method="post" action="">

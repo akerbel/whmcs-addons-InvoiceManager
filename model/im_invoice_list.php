@@ -59,6 +59,13 @@ class im_invoice_list {
 		$result = full_query("
 			SELECT count(*) AS count
 			FROM tblinvoices
+		");
+		$count = mysql_fetch_assoc($result);
+		$this->fullcount = $count['count'];
+		
+		$result = full_query("
+			SELECT count(*) AS count
+			FROM tblinvoices
 			WHERE status = '".$this->status."'
 		");
 		$count = mysql_fetch_assoc($result);
