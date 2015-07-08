@@ -164,6 +164,15 @@ class im_invoice_list {
 		return array('result' => 'success', 'message' => 'Changes have been saved');
 	}
 	
+	public static function deleteAll(){
+		$delete = $_POST['delete_checkbox'];
+		foreach ($delete as $id=>$value){
+			full_query('DELETE FROM tblinvoices WHERE id = "'.$id.'"');
+			full_query('DELETE FROM tblinvoiceitems WHERE invoiceid = "'.$id.'"');
+		}
+		return array('result' => 'success', 'message' => 'Invoice(s) has been deleted');
+	}
+	
 	public function getInvoicenums(){
 		$invoicenums = array();
 		$result = full_query('

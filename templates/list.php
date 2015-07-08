@@ -21,6 +21,7 @@ Show invoices:
 		<tbody>
 			<tr>
 				<th><input id="checkall0" type="checkbox"></th>
+				<th><img width="16" border="0" height="16" alt="Delete" src="images/delete.gif"></th>
 				<?php foreach ($list->tablehead as $value) {?>
 					<th>
 						<?php if ($list->order != $value){ ?>
@@ -41,6 +42,10 @@ Show invoices:
 				<tr class="invoice_tr">
 					<td>
 						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
+					</td>
+					<td>
+						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button" id="delete_<?=$invoice['id']?>">
+						<input class="delete_checkbox" type="checkbox" id="delete_checkbox_<?=$invoice['id']?>" name="delete_checkbox[<?=$invoice['id']?>]" style="display:none;">
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<?php if (($key == 'invoicenum') or ($key == 'notes')){?>
@@ -96,7 +101,10 @@ Show invoices:
 			<?php } ?>
 		</tbody>
 	</table>
+	With selected:
 	<input class="btn" type="submit" value="Save" name="Save" id="Save">
+	<input class="btn" type="submit" value="Delete" name="Delete" id="Delete">
+	<br>
 	<input class="btn" type="button" value="Fill Gaps" name="fillgaps" id="fillgaps">
 </div>
 <div><?=$list->paginator?></div>
@@ -121,6 +129,28 @@ Show invoices:
 				return true;
 			}else{
 				return false;
+			}
+		});
+		
+		$('#Delete').on('click', function(){
+			if (confirm("Are you sure you want to delete this invoices?")) {
+				$('.checkall').each(function(index){
+					if ($(this).attr('checked')){
+						$(this).attr({'checked': false});
+						$('#delete_'+$(this).attr('id')).attr({'checked': true});
+					}
+				});
+				return true;
+			}else{
+				return false;
+			}
+		});
+		
+		$('.delete_button').on('click', function(){
+			if (confirm("Are you sure you want to delete this invoice?")) {
+				$(this).next('.delete_checkbox').attr({'checked': true});
+				$('.checkall').attr({'checked': false});
+				$('form[name="invoice_list"]').submit();
 			}
 		});
 		

@@ -26,8 +26,14 @@ function InvoiceManager_deactivate() {
 
 function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
+	
 	if (isset($_POST['checkbox']) and (count($_POST['checkbox']))){
 		$result = im_invoice_list::saveAll();
+		echo im_invoice_list::showMessage($result);
+	}
+	
+	if (isset($_POST['delete_checkbox']) and (count($_POST['delete_checkbox']))){
+		$result = im_invoice_list::deleteAll();
 		echo im_invoice_list::showMessage($result);
 	}
 	
