@@ -148,7 +148,15 @@ class im_invoice_list {
 				$update = array();
 				foreach ($invoices[$id] as $k=>$v){
 					if ($k == 'invoicenum'){
-						$result = mysql_fetch_assoc(select_query('tblinvoices', 'id', array('invoicenum' => $v)));
+						if ($v == '') { 
+							$result = false;
+						}else{
+							$result = mysql_fetch_assoc(full_query('
+								SELECT id
+								FROM tblinvoices
+								WHERE invoicenum = '.$v.'
+							'));
+						}
 						if ($result){
 							return array(
 								'result' => 'error', 
