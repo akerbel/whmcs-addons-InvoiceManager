@@ -30,7 +30,7 @@ class im_invoice_list {
 		$result = full_query("
 			SELECT i.id AS id, i.invoicenum AS invoicenum, c.firstname AS firstname, c.lastname AS lastname, c.companyname AS companyname, 
 				c.email AS email, i.date AS date, i.duedate AS duedate,
-				i.datepaid AS datepaid, i.status AS status, i.paymentmethod AS paymentmethod, i.notes AS notes, i.userid AS userid
+				i.datepaid AS datepaid, i.status AS status, i.credit AS credit, i.total AS total, i.paymentmethod AS paymentmethod, i.notes AS notes, i.userid AS userid
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
 			WHERE i.status = '".$this->status."'
