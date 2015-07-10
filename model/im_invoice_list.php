@@ -124,6 +124,14 @@ class im_invoice_list {
 		if ($sort == 'ASC') return 'DESC';
 	}
 	
+	public function invoicenumPad($invoicenum){
+		$digits_data = mysql_fetch_assoc(select_query('tbladdonmodules', 'value', array('module' => 'InvoiceManager', 'setting' => 'NumberOfDigits')));
+		if ($digits_data) $digits = (int)$digits_data['value'];
+		else $digits = 0;
+		$newinvoicenum_str = str_pad((string)$invoicenum, $digits, "0", STR_PAD_LEFT);
+		return $newinvoicenum_str;
+	}
+	
 	public static function saveAll(){
 		$checkboxes = $_POST['checkbox'];
 		$invoices = $_POST['invoices'];
