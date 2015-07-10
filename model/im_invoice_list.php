@@ -124,7 +124,7 @@ class im_invoice_list {
 		if ($sort == 'ASC') return 'DESC';
 	}
 	
-	public function invoicenumPad($invoicenum){
+	public static function invoicenumPad($invoicenum){
 		$digits_data = mysql_fetch_assoc(select_query('tbladdonmodules', 'value', array('module' => 'InvoiceManager', 'setting' => 'NumberOfDigits')));
 		if ($digits_data) $digits = (int)$digits_data['value'];
 		else $digits = 0;
@@ -159,6 +159,7 @@ class im_invoice_list {
 						if ($v == '') { 
 							$result = false;
 						}else{
+							$v = im_invoice_list::invoicenumPad($v);
 							$result = mysql_fetch_assoc(full_query('
 								SELECT id
 								FROM tblinvoices
@@ -199,7 +200,7 @@ class im_invoice_list {
 		');
 		$i = $this->firstinvoicenum;
 		while ($invoicenum = mysql_fetch_array($result)){
-			$invoicenums[$i] = array('id' => $invoicenum['id'], 'invoicenum' => $invoicenum['invoicenum']);
+			$invoicenums[im_invoice_list::invoicenumPad($i)] = array('id' => $invoicenum['id'], 'invoicenum' => $invoicenum['invoicenum']);
 			$i++;
 		}
 		return $invoicenums;
@@ -208,7 +209,7 @@ class im_invoice_list {
 	public function fillGaps(){
 		$changes = array();
 		foreach ($this->getInvoicenums() as $key=>$value){
-			if ($key!=$value['invoicenum']){
+			if ((string)$key!==(string)$value['invoicenum']){
 				update_query('tblinvoices', array('invoicenum' => $key), array('id' => $value['id']));
 				$changes[$value['id']] = array($key, $value['invoicenum']);
 			}

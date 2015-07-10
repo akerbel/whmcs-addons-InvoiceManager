@@ -12,7 +12,7 @@ function InvoiceManager_config() {
     "fields" => array(
 		"InvoicesPerPage" => array ("FriendlyName" => "Invoices per page", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "20", ),
 		"FirstInvoicenum" => array ("FriendlyName" => "First invoicenum", "Type" => "text", "Size" => "25", "Description" => "", "Default" => "1", ),
-		"NumberOfDigits" => array ("FriendlyName" => "Number of digits", "Type" => "text", "Size" => "25", "Description" => "the number of digits in the number of", "Default" => "6", ),
+		"NumberOfDigits" => array ("FriendlyName" => "Number of digits", "Type" => "text", "Size" => "25", "Description" => "The number of digits in the number of. If you don't want to use first zero, just type 0", "Default" => "6", ),
 		));
     return $configarray;
 }
