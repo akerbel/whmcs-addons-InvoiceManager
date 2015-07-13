@@ -63,9 +63,9 @@ Show invoices:
 						<?php }elseif (($key == 'firstname') or ($key == 'lastname') or ($key == 'companyname')){ ?>
 							<td><a href="clientssummary.php?userid=<?=$invoice['userid']?>"><?=$value?></a></td>
 						<?php }elseif (($key == 'credit') or ($key == 'total') or ($key == 'companyname')){ ?>
-							<td><a target="" href="invoices.php?action=invtooltip&id=<?=$invoice['id']?>&userid=<?=$invoice['userid']?>&token=<?php echo generate_token("plain"); ?>"><?=$value?></a></td>
+							<td><a class="invtooltip" href="invoices.php?action=invtooltip&id=<?=$invoice['id']?>&userid=<?=$invoice['userid']?>&token=<?php echo generate_token("plain"); ?>"><?=$value?></a></td>
 						<?php }elseif ($key == 'id'){ ?>
-							<td><a href="invoices.php?action=edit&id=<?=$invoice['userid']?>"><?=$value?></a></td>
+							<td><a href="invoices.php?action=edit&id=<?=$invoice['id']?>"><?=$value?></a></td>
 						<?php }else{ ?>
 							<td><?=$value?></td>
 						<?php } ?>
@@ -113,6 +113,8 @@ Show invoices:
 
 <script>
 	$('document').ready(function(){
+		$(".invtooltip").tooltip({cssClass:"invoicetooltip"});
+		
 		$('#checkall0').on('click', function(){
 			$('.checkall').attr({'checked': $(this).prop('checked')});
 		});
