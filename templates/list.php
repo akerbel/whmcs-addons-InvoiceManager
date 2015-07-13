@@ -21,7 +21,7 @@ Show invoices:
 		<tbody>
 			<tr>
 				<th><input id="checkall0" type="checkbox"></th>
-				<th><img width="16" border="0" height="16" alt="Delete" src="images/delete.gif"></th>
+				<th>actions</th>
 				<?php foreach ($list->tablehead as $value) {?>
 					<th>
 						<?php if ($list->order != $value){ ?>
@@ -44,8 +44,11 @@ Show invoices:
 						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
 					</td>
 					<td>
-						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button" id="delete_<?=$invoice['id']?>">
-						<input class="delete_checkbox" type="checkbox" id="delete_checkbox_<?=$invoice['id']?>" name="delete_checkbox[<?=$invoice['id']?>]" style="display:none;">
+						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button" id="delete_<?=$invoice['id']?>" title="Delete">
+						<input class="delete_checkbox" type="checkbox" id="delete_checkbox_<?=$invoice['id']?>" name="delete_checkbox[<?=$invoice['id']?>]" style="display:none;">	
+						<a style="cursor:pointer;" onclick="window.open('../viewinvoice.php?id=<?=$invoice['id']?>','windowfrm','menubar=yes,toolbar=yes,scrollbars=yes,resizable=yes,width=750,height=600')" title="Print version"><img src="/modules/addons/InvoiceManager/templates/print.png"></a>
+						<a style="cursor:pointer;" onclick="window.open('../dl.php?type=i&id=<?=$invoice['id']?>&viewpdf=1','pdfinv','')" title="PDF"><img src="/modules/addons/InvoiceManager/templates/pdf.png"></a>
+						<a style="cursor:pointer;" onclick="window.location='../dl.php?type=i&id=<?=$invoice['id']?>'" title="Download PDF"><img src="/modules/addons/InvoiceManager/templates/downloadpdf.png"></a>
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<?php if (($key == 'invoicenum') or ($key == 'notes')){?>
