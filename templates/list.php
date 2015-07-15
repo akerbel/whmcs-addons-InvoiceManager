@@ -43,7 +43,7 @@ Show invoices:
 					<td>
 						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
 					</td>
-					<td>
+					<td style="min-width: 76px;">
 						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button" id="delete_<?=$invoice['id']?>" title="Delete">
 						<input class="delete_checkbox" type="checkbox" id="delete_checkbox_<?=$invoice['id']?>" name="delete_checkbox[<?=$invoice['id']?>]" style="display:none;">	
 						<a style="cursor:pointer;" onclick="window.open('../viewinvoice.php?id=<?=$invoice['id']?>','windowfrm','menubar=yes,toolbar=yes,scrollbars=yes,resizable=yes,width=750,height=600')" title="Print version"><img src="/modules/addons/InvoiceManager/templates/print.png"></a>
