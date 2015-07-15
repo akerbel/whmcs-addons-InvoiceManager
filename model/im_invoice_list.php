@@ -49,6 +49,18 @@ class im_invoice_list {
 			while ($item = mysql_fetch_assoc($items)){
 				$invoice['items'][] = $item;
 			}
+			if (isset($invoice['duedate'])){
+				$date = DateTime::createFromFormat('Y-m-d', $invoice['duedate']);
+				if ($date) {
+					$invoice['duedate'] = $date->format('d-m-Y');
+				}
+			}
+			if (isset($invoice['datepaid'])){
+				$date = DateTime::createFromFormat('Y-m-d G:i:s', $invoice['datepaid']);
+				if ($date) {
+					$invoice['datepaid'] = $date->format('d-m-Y G:i:s');
+				}
+			}
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
