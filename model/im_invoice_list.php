@@ -40,15 +40,6 @@ class im_invoice_list {
 		");
 		
 		while ($invoice = mysql_fetch_assoc($result)){
-			$invoice['items'] = array();
-			$items = full_query("
-				SELECT description, amount
-				FROM tblinvoiceitems
-				WHERE invoiceid = ".$invoice['id']."
-			");
-			while ($item = mysql_fetch_assoc($items)){
-				$invoice['items'][] = $item;
-			}
 			if (isset($invoice['duedate'])){
 				$date = DateTime::createFromFormat('Y-m-d', $invoice['duedate']);
 				if ($date) {
@@ -64,7 +55,7 @@ class im_invoice_list {
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
-		array_pop($this->tablehead);array_pop($this->tablehead);
+		array_pop($this->tablehead);
 	}
 	
 	public function createPaginator(){

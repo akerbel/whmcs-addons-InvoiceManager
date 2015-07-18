@@ -39,7 +39,7 @@ Show invoices:
 				<tr><td colspan="<?php echo count($list->tablehead); ?>" align="center">No invoices</td></tr>
 			<?php } ?>
 			<?php foreach ($list->invoices as $invoice) {?>
-				<tr class="invoice_tr">
+				<tr>
 					<td>
 						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
 					</td>
@@ -74,35 +74,6 @@ Show invoices:
 						<?php } ?>
 					<?php } ?>
 				</tr>
-				<tr style="display:none;" class="invoiceitems">
-					<td colspan="<?php echo count($list->tablehead); ?>">
-						<table width="100%">
-							<tbody>
-								<tr>
-									<th>#</th><th>Description</th><th>Amount</th>
-								</tr>
-								<?php foreach ($invoice['items'] as $i=>$item){ ?>
-									<tr>
-										<td align="center">
-											<?php echo $i+1; ?>
-										</td>
-										<td>
-											<?=$item['description']?>
-										</td>
-										<td align="center">
-											<?=$item['amount']?>
-										</td>
-									</tr>
-								<?php } ?>
-								<?php if (!count($invoice['items'])) { ?>
-									<tr>
-										<td align="center" colspan="3">No items</td>
-									</tr>
-								<?php } ?>
-							</tbody>
-						</table>
-					</td>
-				</tr>
 			<?php } ?>
 		</tbody>
 	</table>
@@ -111,12 +82,23 @@ Show invoices:
 	<input class="btn" type="submit" value="Delete" name="Delete" id="Delete">
 	<br>
 	<input class="btn" type="button" value="Fill Gaps" name="fillgaps" id="fillgaps">
+	<div id="items_table" style="display: none; position: absolute; border: 3px lightgrey solid;"></div>
 </div>
 <div><?=$list->paginator?></div>
 
 <script>
 	$('document').ready(function(){
-		$(".invtooltip").tooltip({cssClass:"invoicetooltip"});
+		$('.invtooltip').on('click', function(e){
+			$.ajax({
+				'url': $(this).attr('href'),
+				'success': function(data){
+					$('#items_table').html(data).css('left', (e.pageX-180)+'px').css('top', e.pageY+'px').fadeIn();
+				},
+			});
+			return false;
+		});
+		
+		$('#contentarea').on('click', function(){$('#items_table').fadeOut();});
 		
 		$('#checkall0').on('click', function(){
 			$('.checkall').attr({'checked': $(this).prop('checked')});
@@ -124,11 +106,6 @@ Show invoices:
 		
 		$('.invoice_data').on('change', function(){
 			$('#checkbox_'+$(this).attr('invoice_id')).attr({'checked': true});
-		});
-		
-		$('.invoice_tr').on('click', function(){
-			$('.invoiceitems').hide();
-			$(this).next('tr').toggle();
 		});
 		
 		$('#Save').on('click', function(){
