@@ -8,8 +8,8 @@ function hook_invoice_manager_createinvoicenum($vars){
 	else $invoicenum = $max['max']+1;
 	update_query('tblinvoices', array('invoicenum' => $invoicenum), array('id' => $vars['invoiceid']));*/
 	
-	$total = mysql_fetch_assoc(select_query('tblinvoices', 'total', array('id' => $vars['invoiceid'])));
-	if ($total['total'] != 0){ 
+	$total = mysql_fetch_assoc(select_query('tblinvoices', 'credit, total', array('id' => $vars['invoiceid'])));
+	if (((int)$total['total'] != 0) or ((int)$total['credit'] != 0)){ 
 		$invoice = full_query('SELECT invoicenum FROM tblinvoices');
 		$invoices = array();
 		while ($inv = mysql_fetch_assoc($invoice)){
