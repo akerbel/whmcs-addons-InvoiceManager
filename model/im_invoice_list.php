@@ -30,9 +30,11 @@ class im_invoice_list {
 		$result = full_query("
 			SELECT i.id AS id, i.invoicenum AS invoicenum, c.firstname AS firstname, c.lastname AS lastname, c.companyname AS companyname, 
 				c.email AS email, i.duedate AS duedate,
-				i.datepaid AS datepaid, i.status AS status, i.credit AS credit, i.total AS total, i.paymentmethod AS paymentmethod, i.notes AS notes, i.userid AS userid
+				i.datepaid AS datepaid, i.status AS status, i.credit AS credit, i.total AS total,
+				i.paymentmethod AS paymentmethod, i.notes AS notes, i.userid AS userid, im.blocked AS blocked
 			FROM tblinvoices AS i
 			INNER JOIN tblclients AS c ON c.id = i.userid
+			LEFT JOIN mod_InvoiceManager AS im ON im.invoiceid = i.id
 			WHERE i.status = '".$this->status."'
 			".//"ORDER BY ".($this->order == 'invoicenum' ? "CAST(".$this->order." AS INT) " : $this->order.' '). $this->sort.
 			" ORDER BY ".$this->order." ".$this->sort.
@@ -55,7 +57,7 @@ class im_invoice_list {
 			$this->invoices[] = $invoice;
 		}
 		$this->tablehead = array_keys($this->invoices[0]);
-		array_pop($this->tablehead);
+		array_pop($this->tablehead);array_pop($this->tablehead);
 	}
 	
 	public function createPaginator(){
@@ -166,7 +168,7 @@ class im_invoice_list {
 							$result = mysql_fetch_assoc(full_query('
 								SELECT id
 								FROM tblinvoices
-								WHERE invoicenum = '.$v.'
+								WHERE invoicenum = '.$v.' AND id != '.$id.'
 							'));
 						}
 						if ($result){
@@ -191,6 +193,16 @@ class im_invoice_list {
 			full_query('DELETE FROM tblinvoiceitems WHERE invoiceid = "'.$id.'"');
 		}
 		return array('result' => 'success', 'message' => 'Invoice(s) has been deleted');
+	}
+	
+	public static function toggleInvoice($id){
+		$result = mysql_fetch_assoc(full_query('SELECT id, blocked FROM mod_InvoiceManager WHERE invoiceid = '.$id.''));
+		if ($result['id']){
+			update_query('mod_InvoiceManager', array('blocked' => ($result['blocked'] ? 0 : 1)), array('id' => $result['id']));
+		}else{
+			insert_query('mod_InvoiceManager', array('blocked' => 1, 'invoiceid' => $id));
+		}
+		return array('result' => 'success', 'message' => ($result['blocked'] ? 'Invoice#'.$id.' unblocked' : 'Invoice#'.$id.' blocked'));
 	}
 	
 	public function getInvoicenums(){

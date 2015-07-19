@@ -18,6 +18,15 @@ function InvoiceManager_config() {
 }
 
 function InvoiceManager_activate() {
+	$result = mysql_fetch_assoc(full_query('SELECT * FROM mod_InvoiceManager'));
+	if (!$result){
+		$query = "CREATE TABLE `mod_InvoiceManager` (`id` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`invoiceid` INT(10) NOT NULL,
+			`blocked` INT(1) NOT NULL
+		) ENGINE=InnoDB CHARACTER SET=utf8";
+		$result = full_query($query);
+		if (!$result) return array('status'=>'error','description'=>'Can`t create table mod_InvoiceManager.');
+	}
     return array('status'=>'success','description'=>'Success!');
 }
 
@@ -27,6 +36,11 @@ function InvoiceManager_deactivate() {
 
 function InvoiceManager_output($vars) {
 	include_once('model/im_invoice_list.php');
+	
+	if ((isset($_POST['active_id'])) and ($_POST['active_id'])){
+		$result = im_invoice_list::toggleInvoice($_POST['active_id']);
+		echo im_invoice_list::showMessage($result);
+	}
 	
 	if (isset($_POST['checkbox']) and (count($_POST['checkbox']))){
 		$result = im_invoice_list::saveAll();

@@ -2,6 +2,12 @@
 if (!defined("WHMCS")) 
 	die("This file cannot be accessed directly");
 ?>
+<style>
+	.blocked_invoice td {
+		background-color: #f0fff0!important;
+	}
+</style>
+
 <div>
 Show invoices: 
 <?php foreach ($list->statuses as $status){ ?>
@@ -34,17 +40,18 @@ Show invoices:
 						<?php } ?>
 					</th>
 				<?php } ?>
+				<th>active</th>
 			</tr>
 			<?php if (!count($list->invoices)) { ?>
 				<tr><td colspan="<?php echo count($list->tablehead); ?>" align="center">No invoices</td></tr>
 			<?php } ?>
 			<?php foreach ($list->invoices as $invoice) {?>
-				<tr>
-					<td>
-						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]">
+				<tr <?php if ($invoice['blocked']){ ?> class="blocked_invoice" <?php } ?> >
+					<td align="center">
+						<input class="checkall" type="checkbox" id = "checkbox_<?=$invoice['id']?>" name="checkbox[<?=$invoice['id']?>]" <?php if ($invoice['blocked']) echo 'disabled title="Invoice blocked"'; ?>>
 					</td>
 					<td style="min-width: 76px;">
-						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button" id="delete_<?=$invoice['id']?>" title="Delete">
+						<img style="cursor:pointer;" width="16" border="0" height="16" alt="Delete" src="images/delete.gif" class="delete_button<?php if ($invoice['blocked']) echo '_disabled'; ?>" id="delete_<?=$invoice['id']?>" title="<?php if ($invoice['blocked']){ echo 'Invoice blocked'; }else{ echo 'Delete';} ?>">
 						<input class="delete_checkbox" type="checkbox" id="delete_checkbox_<?=$invoice['id']?>" name="delete_checkbox[<?=$invoice['id']?>]" style="display:none;">	
 						<a style="cursor:pointer;" onclick="window.open('../viewinvoice.php?id=<?=$invoice['id']?>','windowfrm','menubar=yes,toolbar=yes,scrollbars=yes,resizable=yes,width=750,height=600')" title="Print version"><img src="/modules/addons/InvoiceManager/templates/print.png"></a>
 						<a style="cursor:pointer;" onclick="window.open('../dl.php?type=i&id=<?=$invoice['id']?>&viewpdf=1','pdfinv','')" title="PDF"><img src="/modules/addons/InvoiceManager/templates/pdf.png"></a>
@@ -52,16 +59,16 @@ Show invoices:
 					</td>
 					<?php foreach ($invoice as $key=>$value) {?>
 						<?php if (($key == 'invoicenum') or ($key == 'notes')){?>
-							<td><input class="invoice_data im_<?=$key?>" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>"></td>
+							<td><input class="invoice_data im_<?=$key?>" type="text" value="<?=$value?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>" <?php if ($invoice['blocked']) echo 'disabled title="Invoice blocked"'; ?>></td>
 						<?php }elseif ($key == 'status'){ ?>
 							<td>
-								<select class="invoice_data im_<?=$key?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>">
+								<select class="invoice_data im_<?=$key?>" name="invoices[<?=$invoice['id']?>][<?=$key?>]" invoice_id="<?=$invoice['id']?>" <?php if ($invoice['blocked']) echo 'disabled title="Invoice blocked"'; ?>>
 									<?php foreach ($list->statuses as $status){ ?>
 										<option value="<?=$status?>"<?php if ($status == $value){ ?> selected<?php } ?>><?=$status?></option>
 									<?php } ?>
 								</select>
 							</td>
-						<?php }elseif (($key == 'items') or ($key == 'userid')){ ?>
+						<?php }elseif (($key == 'items') or ($key == 'userid') or ($key == 'blocked')){ ?>
 
 						<?php }elseif (($key == 'firstname') or ($key == 'lastname') or ($key == 'companyname')){ ?>
 							<td><a href="clientssummary.php?userid=<?=$invoice['userid']?>"><?=$value?></a></td>
@@ -73,6 +80,9 @@ Show invoices:
 							<td><?=$value?></td>
 						<?php } ?>
 					<?php } ?>
+					<td align="center">
+						<input class="active" type="checkbox" id="active_checkbox_<?=$invoice['id']?>" invoice_id="<?=$invoice['id']?>" name="active_checkbox[<?=$invoice['id']?>]" <?php if (!$invoice['blocked']){?>checked<?php } ?>>
+					</td>
 				</tr>
 			<?php } ?>
 		</tbody>
@@ -84,10 +94,19 @@ Show invoices:
 	<input class="btn" type="button" value="Fill Gaps" name="fillgaps" id="fillgaps">
 	<div id="items_table" style="display: none; position: absolute; border: 3px lightgrey solid;"></div>
 </div>
+</form>
+<form name="active_form" id="active_form" method="post" action="">
+	<input type="hidden" name="active_id" id="active_id">
+</form>
 <div><?=$list->paginator?></div>
 
 <script>
 	$('document').ready(function(){
+		$('.active').on('click', function(){
+			$('#active_id').attr({'value': $(this).attr('invoice_id')});
+			$('#active_form').submit();
+		});
+		
 		$('.invtooltip').on('click', function(e){
 			$.ajax({
 				'url': $(this).attr('href'),
