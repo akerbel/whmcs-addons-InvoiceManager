@@ -111,10 +111,19 @@ Show invoices:
 			$.ajax({
 				'url': $(this).attr('href'),
 				'success': function(data){
-					$('#items_table').html(data).css('left', (e.pageX-180)+'px').css('top', e.pageY+'px').fadeIn();
+					$('#items_table')
+						.html(data)
+						.css('left', (e.pageX-180)+'px')
+						.css('top', e.pageY+'px')
+						.fadeIn();
+					$('<div id="close_items_table" style="position: absolute; right: 0; top: 0; cursor: pointer;"><b>X</b></div>').appendTo('#items_table');
 				},
 			});
 			return false;
+		});
+		
+		$('#close_items_table').on('click', function(){
+			$('#items_table').fadeOut();
 		});
 		
 		$('#contentarea').on('click', function(){$('#items_table').fadeOut();});
