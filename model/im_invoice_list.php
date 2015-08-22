@@ -206,28 +206,67 @@ class im_invoice_list {
 	}
 	
 	public function getInvoicenums(){
+		function invoice_sort($a, $b){
+			if (($a['invoicenum'] == '') and ($b['invoicenum'] == '')){
+				if ((int)$a['id'] == (int)$b['id'])return 0;
+				return ((int)$a['id'] < (int)$b['id']) ? -1 : 1;
+			}
+			if ($a['invoicenum'] == '') return 1;
+			if ($b['invoicenum'] == '') return -1;
+			$a_year = substr($a['invoicenum'], strripos($a['invoicenum'], '-')+1);
+			$b_year = substr($b['invoicenum'], strripos($b['invoicenum'], '-')+1);
+			if ($a_year == $b_year) {
+				if ((int)$a['invoicenum'] == (int)$b['invoicenum'])return 0;
+				return ((int)$a['invoicenum'] < (int)$b['invoicenum']) ? -1 : 1;
+			}
+			return ($a_year < $b_year) ? -1 : 1;
+		}
 		$invoicenums = array();
 		$result = full_query('
 			SELECT id, invoicenum 
 			FROM tblinvoices 
 			WHERE status = "Paid"
-			ORDER BY id ASC
+			ORDER BY invoicenum ASC
 		');
-		$i = $this->firstinvoicenum;
 		while ($invoicenum = mysql_fetch_array($result)){
-			$invoicenums[im_invoice_list::invoicenumPad($i)] = array('id' => $invoicenum['id'], 'invoicenum' => $invoicenum['invoicenum']);
-			$i++;
+			$invoicenums[] = array('id' => $invoicenum['id'], 'invoicenum' => $invoicenum['invoicenum']);
 		}
+		usort($invoicenums, "invoice_sort");
 		return $invoicenums;
 	}
 	
 	public function fillGaps(){
 		$changes = array();
+		$lastNum = 0;
+		$lastYear = 0;
 		foreach ($this->getInvoicenums() as $key=>$value){
-			if ((string)$key!==(string)$value['invoicenum']){
-				update_query('tblinvoices', array('invoicenum' => $key), array('id' => $value['id']));
-				$changes[$value['id']] = array($key, $value['invoicenum']);
+			$num = $this->getNum($value['invoicenum']);
+			$year = $this->getNumYear($value['invoicenum']);
+			if ((!$year) or (!$num)){
+				$year = $this->getInvoiceYearById($value['id']);
+				$num = $lastNum+1;
+				update_query('tblinvoices', array('invoicenum' => $num.'-'.$year), array('id' => $value['id']));
+				$changes[$value['id']] = array($value['invoicenum'], $num.'-'.$year);
+				$lastNum = $num;
+				$lastYear = $year;
+				continue;
 			}
+			if (($year > $lastYear) and ($num != 1)){
+				$lastNum = 1;
+				$lastYear = $year;
+				update_query('tblinvoices', array('invoicenum' => '1-'.$year), array('id' => $value['id']));
+				$changes[$value['id']] = array($value['invoicenum'], '1-'.$year);
+				continue;
+			}
+			if ($num != $lastNum+1){
+				update_query('tblinvoices', array('invoicenum' => ($lastNum+1).'-'.$year), array('id' => $value['id']));
+				$changes[$value['id']] = array($value['invoicenum'], ($lastNum+1).'-'.$year);
+				$lastNum++;
+				$lastYear = $year;
+				continue;
+			}
+			$lastNum++;
+			$lastYear = $year;
 		}
 		if (!count($changes)){
 			$message = 'Nothing to fill';
@@ -237,6 +276,25 @@ class im_invoice_list {
 		return array('result' => 'success', 'message' => $message, 'changes' => $changes);
 	}
 	
+	public function getNum($str){
+		return substr($str, 0, strripos($str, '-'));
+	}
+	
+	public function getNumYear($str){
+		return substr($str, strripos($str, '-')+1);
+	}
+	
+	public function getInvoiceYearById($id){
+		$result = mysql_fetch_assoc(full_query('
+			SELECT datepaid
+			FROM tblinvoices 
+			WHERE id = "'.$id.'"
+		'));
+		if (!$result) return false;
+		$date = DateTime::createFromFormat('Y-m-d G:i:s', $result['datepaid']);
+		if (!$date) return false;
+		return $date->format('Y');
+	}
 }
 
 ?>

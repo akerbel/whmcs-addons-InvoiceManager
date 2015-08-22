@@ -27,4 +27,4 @@ function hook_invoice_manager_createinvoicenum($vars){
 	}
 }
 
-add_hook('InvoicePaid', 555, 'hook_invoice_manager_createinvoicenum');
+//add_hook('InvoicePaid', 555, 'hook_invoice_manager_createinvoicenum');
