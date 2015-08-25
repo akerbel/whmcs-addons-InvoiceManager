@@ -258,16 +258,17 @@ class im_invoice_list {
 				$changes[$value['id']] = array($value['invoicenum'], '1-'.$year);
 				continue;
 			}
-			if ($num != $lastNum+1){
+			if (($num != $lastNum+1) and ($year == $lastYear)){
 				update_query('tblinvoices', array('invoicenum' => ($lastNum+1).'-'.$year), array('id' => $value['id']));
 				$changes[$value['id']] = array($value['invoicenum'], ($lastNum+1).'-'.$year);
 				$lastNum++;
 				$lastYear = $year;
 				continue;
 			}
-			$lastNum++;
+			$lastNum = $num;
 			$lastYear = $year;
 		}
+		update_query('tblconfiguration', array('value' => ($lastNum+1)), array('setting' => 'SequentialInvoiceNumberValue'));
 		if (!count($changes)){
 			$message = 'Nothing to fill';
 		}else{
