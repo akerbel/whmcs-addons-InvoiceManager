@@ -18,7 +18,7 @@ function InvoiceManager_config() {
 }
 
 function InvoiceManager_activate() {
-	$result = mysql_fetch_assoc(full_query('SELECT * FROM mod_InvoiceManager'));
+	$result = mysql_fetch_assoc(full_query('Show tables like "mod_InvoiceManager"'));
 	if (!$result){
 		$query = "CREATE TABLE `mod_InvoiceManager` (`id` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 			`invoiceid` INT(10) NOT NULL,
